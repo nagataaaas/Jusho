@@ -1,0 +1,10 @@
+__title__ = "jusho"
+__description__ = "Easy wrapper for the postal code data of Japan"
+__url__ = "https://github.com/nagataaaas/Jusho"
+__version_info__ = ("0", "0", "1")
+__version__ = ".".join(__version_info__)
+__author__ = "Yamato Nagata"
+__author_email__ = "chickenwingswillfly@gmail.com"
+__maintainer__ = "Yamato Nagata"
+__license__ = "MIT"
+__copyright__ = "(c) 2020 by Yamato Nagata"

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>example1</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script>
+        function pref() {
+            $("#city").prop('disabled', true)
+            $("#town").prop('disabled', true)
+            $("#city").val('')
+            $("#town").val('')
+            if ($("#prefecture").val() === "") {
+                $("#pref-suggest").empty();
+                return;
+            }
+            $.ajax({
+                type: "POST",
+                url: "/api/pref",
+                dataType: 'json',
+                data: JSON.stringify({"pref": $("#prefecture").val()})
+            }).done((msg) => {
+                $("#pref-suggest").empty();
+                $("#pref-suggest").css('top', $("#prefecture").get(0).getBoundingClientRect()[3]);
+                msg.similar.forEach(e => {
+                    console.log(e)
+                    $("#pref-suggest").append(`<li onclick="prefer('${e[1]}')">${e[0]}</li>`)
+                })
+            })
+        }
+
+        function prefer(str) {
+            $("#prefecture").val(str)
+            $("#pref-suggest").empty();
+            $("#city").prop('disabled', false)
+        }
+
+        function cit() {
+            $("#town").prop('disabled', true)
+            $("#town").val('')
+            if ($("#city").val() === "") {
+                $("#city-suggest").empty();
+                return;
+            }
+            $.ajax({
+                type: "POST",
+                url: "/api/city",
+                dataType: 'json',
+                data: JSON.stringify({"pref": $("#prefecture").val(), "city": $("#city").val()})
+            }).done((msg) => {
+                $("#city-suggest").empty();
+                $("#city-suggest").css('top', $("#city").get(0).getBoundingClientRect()[3]);
+                msg.similar.forEach(e => {
+                    console.log(e)
+                    $("#city-suggest").append(`<li onclick="citier('${e[1]}')">${e[0]}</li>`)
+                })
+            })
+        }
+
+        function citier(str) {
+            $("#city").val(str)
+            $("#city-suggest").empty();
+            $("#town").prop('disabled', false)
+        }
+
+        function tow() {
+            if ($("#town").val() === "") {
+                $("#town-suggest").empty();
+                return;
+            }
+            $.ajax({
+                type: "POST",
+                url: "/api/town",
+                dataType: 'json',
+                data: JSON.stringify({"pref": $("#prefecture").val(), "city": $("#city").val(), "town": $("#town").val()})
+            }).done((msg) => {
+                $("#town-suggest").empty();
+                $("#town-suggest").css('top', $("#town").get(0).getBoundingClientRect()[3]);
+                msg.similar.forEach(e => {
+                    console.log(e)
+                    $("#town-suggest").append(`<li onclick="towner('${e[1]}')">${e[0]}</li>`)
+                })
+            })
+        }
+
+        function towner(str) {
+            $("#town").val(str)
+            $("#town-suggest").empty();
+            $.ajax({
+                type: "POST",
+                url: "/api/postal",
+                dataType: 'json',
+                data: JSON.stringify({"pref": $("#prefecture").val(), "city": $("#city").val(), "town": $("#town").val()})
+            }).done((msg) => {
+                $("#postalcode").text(`郵便番号: 〒${msg.postal}`);
+            })
+        }
+    </script>
+</head>
+<body>
+<div class="container">
+    <h1 id="postalcode">郵便番号: </h1>
+    <form>
+        <div>
+            <input id="prefecture" autocomplete="off" onkeyup="pref()">
+            <label for="prefecture">都道府県</label>
+            <ul id="pref-suggest" class="suggest">
+            </ul>
+        </div>
+        <div>
+            <input id="city" autocomplete="off" disabled onkeyup="cit()">
+            <label for="prefecture">市区町村</label>
+            <ul id="city-suggest" class="suggest">
+            </ul>
+        </div>
+        <div>
+            <input id="town" autocomplete="off" disabled onkeyup="tow()">
+            <label for="prefecture">町域</label>
+            <ul id="town-suggest" class="suggest">
+            </ul>
+        </div>
+    </form>
+</div>
+<style>
+    body {
+        background: #EEEEEE;
+        text-align: center;
+    }
+
+    label{
+        width: 30%;
+        display: inline-block;
+    }
+
+    ul {
+        list-style: none;
+        background: white;
+        padding-inline-start: 0;
+        margin-block-start: 0;
+    }
+
+    li {
+        width: 20em;
+        font-size: 1.3em;
+        border: 1px solid #DDD;
+        padding-left: 2em;
+        text-align: left;
+        height: 1.5em;
+        overflow: hidden;
+    }
+
+    .suggest {
+        position: absolute;
+    }
+
+    .container {
+        width: 90%;
+        height: 90%;
+        padding: 5em;
+        background: white;
+    }
+
+    input {
+        width: 60%;
+        height: 2em;
+        font-size: 1.2em;
+    }
+
+    label {
+        width: 30%;
+    }
+
+    form > div {
+        height: 30%;
+        margin: 10%;
+    }
+
+    form {
+        height: 100%;
+    }
+</style>
+</body>
+</html>

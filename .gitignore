@@ -1,0 +1,12 @@
+.idea
+.pypirc
+jusho/__pycache__
+MANIFEST.in
+organize_data.py
+static/
+builder.py
+build/
+dist/
+install_requirements.py
+jusho.egg-info/
+test/__pycache__
