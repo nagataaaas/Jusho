@@ -2,6 +2,10 @@ Easy wrapper for the postal code data of Japan
 -----------
 Powered by [Yamato Nagata](https://twitter.com/514YJ)
 
+install with pip
+
+```$ pip install jusho```
+
 [GitHub](https://github.com/nagataaaas/Jusho)
 
 Useful example [HERE](https://github.com/nagataaaas/Jusho/example/example1)
