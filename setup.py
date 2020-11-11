@@ -5,7 +5,7 @@ Powered by [Yamato Nagata](https://twitter.com/514YJ)
 
 [GitHub](https://github.com/nagataaaas/Jusho)
 
-Useful example [HERE](https://github.com/nagataaaas/Jusho/example/example1)
+Useful example [HERE](https://github.com/nagataaaas/Jusho/tree/main/example/example1)
 
 Using sqlite3 for the whole data. Runs really fast and uses less memory.
 
