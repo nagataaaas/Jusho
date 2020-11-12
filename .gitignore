@@ -3,7 +3,7 @@
 jusho/__pycache__
 MANIFEST.in
 organize_data.py
-static/
+static/*.CSV
 builder.py
 build/
 dist/
