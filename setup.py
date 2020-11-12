@@ -6,6 +6,7 @@ Powered by [Yamato Nagata](https://twitter.com/514YJ)
 [GitHub](https://github.com/nagataaaas/Jusho)
 
 Useful example [HERE](https://github.com/nagataaaas/Jusho/tree/main/example/example1)
+![demo](https://github.com/nagataaaas/Jusho/blob/main/static/example1.gif?raw=true)
 
 Using sqlite3 for the whole data. Runs really fast and uses less memory.
 
