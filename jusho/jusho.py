@@ -2,6 +2,8 @@ import sqlite3
 import os
 import sys
 
+from typing import List, Tuple, Union
+
 
 class Address:
     def __init__(self, admin_division_code: str, old_postal_code: str, postal_code: str, prefecture_kana: str,
@@ -65,18 +67,18 @@ class Jusho:
             raise FileNotFoundError("database file not found")
         self.c = self.conn.cursor()
 
-    def from_postal_code(self, postal_code: str) -> Address or None:
+    def from_postal_code(self, postal_code: str) -> Union[Address, None]:
         postal_code = str(postal_code).replace('〒', '').replace('-', '').strip()
         self.c.execute("SELECT * FROM address WHERE postal_code=?", (postal_code,))
         result = self.c.fetchone()
         return Address(*result) if result else None
 
     @property
-    def prefectures(self) -> list[tuple[str]]:
+    def prefectures(self) -> List[Tuple[str]]:
         self.c.execute("SELECT distinct prefecture_kana, prefecture_kanji, prefecture_eng FROM address")
         return self.c.fetchall()
 
-    def cities_from_prefecture(self, prefecture: str, type='kana') -> list[tuple[str]]:
+    def cities_from_prefecture(self, prefecture: str, type='kana') -> List[Tuple[str]]:
         assert type in ('kana', 'kanji', 'eng')
         if type == 'kana':
             self.c.execute("SELECT distinct city_kana, city_kanji, city_eng FROM address WHERE prefecture_kana=?",
@@ -89,7 +91,7 @@ class Jusho:
                            (prefecture,))
         return self.c.fetchall()
 
-    def towns_from_city(self, prefecture: str, city: str, type='kana') -> list[Address]:
+    def towns_from_city(self, prefecture: str, city: str, type='kana') -> List[Address]:
         assert type in ('kana', 'kanji', 'eng')
         if type == 'kana':
             self.c.execute("SELECT distinct * FROM address WHERE prefecture_kana=? AND city_kana=?", (prefecture, city))
@@ -100,7 +102,7 @@ class Jusho:
             self.c.execute("SELECT distinct * FROM address WHERE prefecture_eng=? AND city_eng", (prefecture, city))
         return [Address(*result) for result in self.c.fetchall()]
 
-    def address_from_town(self, prefecture: str, city: str, town: str, type='kana') -> list[Address] or [None]:
+    def address_from_town(self, prefecture: str, city: str, town: str, type='kana') -> Union[List[Address], [None]]:
         assert type in ('kana', 'kanji', 'eng')
         if type == 'kana':
             self.c.execute(
