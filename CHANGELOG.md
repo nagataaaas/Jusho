@@ -1,3 +1,6 @@
+# v0.0.3
+- fixed annotation error
+
 # v0.0.2
 - using typing for annotation to fix the typeError on Python Below 3.9
 

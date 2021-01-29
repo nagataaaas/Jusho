@@ -102,7 +102,7 @@ class Jusho:
             self.c.execute("SELECT distinct * FROM address WHERE prefecture_eng=? AND city_eng", (prefecture, city))
         return [Address(*result) for result in self.c.fetchall()]
 
-    def address_from_town(self, prefecture: str, city: str, town: str, type='kana') -> Union[List[Address], [None]]:
+    def address_from_town(self, prefecture: str, city: str, town: str, type='kana') -> Union[List[Address], List[None]]:
         assert type in ('kana', 'kanji', 'eng')
         if type == 'kana':
             self.c.execute(
