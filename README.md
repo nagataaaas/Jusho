@@ -9,6 +9,7 @@ install with pip
 [GitHub](https://github.com/nagataaaas/Jusho)
 
 Useful example [HERE](https://github.com/nagataaaas/Jusho/tree/main/example/example1)
+
 ![demo](https://github.com/nagataaaas/Jusho/blob/main/static/example1.gif?raw=true)
 
 Using sqlite3 for the whole data. Runs really fast and uses less memory.
@@ -18,45 +19,50 @@ from jusho import Jusho
 
 postman = Jusho()
 
-print(postman.from_postal_code('160-0021')) # '1600021', '〒1600021' and whatever is valid
-  # 〒160-0021, 東京都 新宿区 歌舞伎町(TOKYO TO SHINJUKU KU KABUKICHO)
+print(postman.from_postal_code('160-0021'))  # '1600021', '〒1600021' and whatever is valid
+# 〒160-0021, 東京都 新宿区 歌舞伎町(TOKYO TO SHINJUKU KU KABUKICHO)
 
 print(postman.prefectures)
-  # [('アイチケン', '愛知県', 'AICHI KEN'), ('アオモリケン', '青森県', 'AOMORI KEN'), ('アキタケン', '秋田県', 'AKITA KEN'), ('イシカワケン', '石川県', 'ISHIKAWA KEN'), ('イバラキケン', '茨城県'... 
+# [('アイチケン', '愛知県', 'AICHI KEN'), ('アオモリケン', '青森県', 'AOMORI KEN'), ('アキタケン', '秋田県', 'AKITA KEN'), ('イシカワケン', '石川県', 'ISHIKAWA KEN'), ('イバラキケン', '茨城県'... 
 
-print(postman.cities_from_prefecture('大阪府', type='kanji'))
-  # [('ミシマグンシマモトチョウ', '三島郡島本町', 'MISHIMA GUN SHIMAMOTO CHO'), ('オオサカシミヤコジマク', '大阪市都島区', 'OSAKA SHI MIYAKOJIMA KU'), ('オオサカシフクシマク', '大阪市福島区', 'OSAK... 
+print(postman.cities_from_prefecture('大阪府', type_='kanji'))
+# [('ミシマグンシマモトチョウ', '三島郡島本町', 'MISHIMA GUN SHIMAMOTO CHO'), ('オオサカシミヤコジマク', '大阪市都島区', 'OSAKA SHI MIYAKOJIMA KU'), ('オオサカシフクシマク', '大阪市福島区', 'OSAK... 
 
 print(postman.towns_from_city('大阪府', '三島郡島本町', 'kanji'))
-  # [<Address: 〒618-0000, 大阪府 三島郡島本町 以下に掲載がない場合(OSAKA FU MISHIMA GUN SHIMAMOTO CHO IKANIKEISAIGANAIBAAI)>, <Address: 〒618-0015, 大阪府 三島郡島本町 青葉(OSAKA FU MISHIMA GUN SHIMAMOTO CHO AOBA)>, <Address: 〒618-0013, 大阪府 三島郡島本町 江川(OSAK...
+# [<Address: 〒618-0000, 大阪府 三島郡島本町 以下に掲載がない場合(OSAKA FU MISHIMA GUN SHIMAMOTO CHO IKANIKEISAIGANAIBAAI)>, <Address: 〒618-0015, 大阪府 三島郡島本町 青葉(OSAKA FU MISHIMA GUN SHIMAMOTO CHO AOBA)>, <Address: 〒618-0013, 大阪府 三島郡島本町 江川(OSAK...
 
 aoba = postman.address_from_town('大阪府', '三島郡島本町', '青葉', 'kanji')
 print(aoba.hyphen_postal)
-  # 618-0015
+# 618-0015
 
 """
 Address object has a lot of info
 """
 
 aoba.admin_division_code: str
-  # 全国地方公共団体コード(Administrative divisions Code)
+# 全国地方公共団体コード(Administrative divisions Code)
 aoba.old_postal_code: str
-  # the old postal code
+# the old postal code
 aoba.postal_code: str
-  # the postal code
+# the postal code
 aoba.prefecture_kana(_kanji, _eng): str
-  # prefecture name in hiragana, kanji, and English
+# prefecture name in hiragana, kanji, and English
 aoba.city_kana(_kanji, _eng): str
-  # city name in hiragana, kanji, and English
+# city name in hiragana, kanji, and English
 aoba.town_area_kana(_kanji, _eng): str
-  # town area name in hiragana, kanji, and English
+# town area name in hiragana, kanji, and English
 aoba.multiple_postal_code: bool
-  # whether the area has alter postal codes
+# whether the area has alter postal codes
 aoba.multiple_address: bool
-  # whether the postal code includes multiple `Banchi`
+# whether the postal code includes multiple `Banchi`
 aoba.has_chome: bool
-  # whether the area has `Chome` which means subdivided areas
+# whether the area has `Chome` which means subdivided areas
 aoba.multiple_town_area: bool
-  # whether the postal code includes multiple areas
+# whether the postal code includes multiple areas
 
 ```
+
+# data
+data is from Japan Post
+- https://www.post.japanpost.jp/zipcode/dl/roman-zip.html
+- https://www.post.japanpost.jp/zipcode/dl/kogaki-zip.html

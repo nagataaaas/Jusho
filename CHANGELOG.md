@@ -1,3 +1,8 @@
+# v0.0.4
+- fixed jusho couldn't be found database file
+- update database file
+- slight fix of README.md
+
 # v0.0.3
 - fixed annotation error
 
