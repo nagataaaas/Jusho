@@ -61,7 +61,6 @@ class Address:
 
 class Jusho:
     def __init__(self):
-        print(get_database_path())
         self.conn = sqlite3.connect(get_database_path())
         self.c = self.conn.cursor()
 

@@ -1,3 +1,6 @@
+# v0.0.5
+- remove printf debug (so sorry)
+
 # v0.0.4
 - fixed jusho couldn't be found database file
 - update database file
