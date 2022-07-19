@@ -56,7 +56,7 @@ class Jusho:
     def prefecture_by_id(self, id_: int) -> Prefecture:
         table = id_to_table_type(id_)
         if table != 'prefectures':
-            warnings.warn(f"id_: {id_} does not seem to be a prefecture id. rather, it's a {table} id")
+            warnings.warn(f"id_: {id_} does not seem to be a prefecture id. rather, it's a {table} id", RuntimeWarning)
         return gateway.prefectures.fetch_prefecture_by_id(self.cursor, id_)
 
     # #-#-#-#-#-#-#-#-# CITIES #-#-#-#-#-#-#-#-# #
@@ -76,7 +76,7 @@ class Jusho:
     def city_by_id(self, id_: int) -> City:
         table = id_to_table_type(id_)
         if table != 'cities':
-            warnings.warn(f"id_: {id_} does not seem to be a city id. rather, it's a {table} id")
+            warnings.warn(f"id_: {id_} does not seem to be a city id. rather, it's a {table} id", RuntimeWarning)
         return gateway.cities.fetch_city_by_id(self.cursor, id_)
 
     # #-#-#-#-#-#-#-#-# ADDRESSES #-#-#-#-#-#-#-#-# #
@@ -102,7 +102,7 @@ class Jusho:
     def address_by_id(self, id_: int) -> Address:
         table = id_to_table_type(id_)
         if table != 'addresses':
-            warnings.warn(f"id_: {id_} does not seem to be a address id. rather, it's a {table} id")
+            warnings.warn(f"id_: {id_} does not seem to be a address id. rather, it's a {table} id", RuntimeWarning)
         return gateway.addresses.fetch_address_by_id(self.cursor, id_)
 
     def close(self):
