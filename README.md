@@ -2,17 +2,17 @@ Easy wrapper for the zip code data of Japan
 -----------
 Powered by [Yamato Nagata](https://twitter.com/514YJ)
 
+# Installation
 install with pip
 
 ```$ pip install jusho```
 
 [GitHub](https://github.com/nagataaaas/Jusho)
 
+# Example
 Useful example [HERE](https://github.com/nagataaaas/Jusho/tree/main/example/example1)
 
 ![demo](https://github.com/nagataaaas/Jusho/blob/main/static/example1.gif?raw=true)
-
-Using sqlite3 for the whole data. Runs really fast and uses less memory.
 
 ```python
 from jusho import Jusho, Address, City, Prefecture
@@ -76,6 +76,16 @@ print('\n'.join((
 )))
 
 ```
+
+# TroubleShooting
+
+## No database file found!
+Database file is already included in the package.\
+But in case `Jusho` can't find the database file, you can download it with `Jusho.create_database(path: str)`.
+
+And then specify the path to the database file like `Jusho(database_path='/path/to/database.db')`.
+
+```python
 
 # data
 data is from Japan Post
