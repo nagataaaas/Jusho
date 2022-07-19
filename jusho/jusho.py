@@ -1,9 +1,12 @@
-import sqlite3
 import os
+import re
+import sqlite3
 import sys
+import warnings
+from typing import List, Union
 
-from typing import List, Tuple, Union
-from dataclasses import dataclass
+from jusho import gateway
+from .models import Address, Prefecture, City, id_to_table_type
 
 
 def get_database_path() -> str:
@@ -17,90 +20,90 @@ def get_database_path() -> str:
         raise FileNotFoundError("database file not found")
 
 
-@dataclass(frozen=True)
-class Address:
-    admin_division_code: str
-    old_postal_code: str
-    postal_code: str
-    prefecture_kana: str
-    city_kana: str
-    town_area_kana: str
-    prefecture_kanji: str
-    city_kanji: str
-    town_area_kanji: str
-    prefecture_eng: str
-    city_eng: str
-    town_area_eng: str
-    multiple_postal_code: bool
-    multiple_address: bool
-    has_chome: bool
-    multiple_town_area: bool
-
-    @property
-    def to_sql(self):
-        return f"'{self.admin_division_code}', '{self.old_postal_code}', '{self.postal_code}', " \
-               f"'{self.prefecture_kana}', '{self.city_kana}', '{self.town_area_kana}', '{self.prefecture_kanji}', " \
-               f"'{self.city_kanji}', '{self.town_area_kanji}', '{self.prefecture_eng}', '{self.city_eng}', " \
-               f"'{self.town_area_eng}', {self.multiple_postal_code}, {self.multiple_address}, " \
-               f"{self.has_chome}, {self.multiple_town_area}"
-
-    @property
-    def hyphen_postal(self):
-        return "{}-{}".format(self.postal_code[:3], self.postal_code[3:])
-
-    def __str__(self):
-        if self.town_area_kanji == '以下に掲載がない場合':
-            return "〒{}-{}, {} {}({} {})".format(self.postal_code[:3], self.postal_code[3:],
-                                                 self.prefecture_kanji, self.city_kanji,
-                                                 self.prefecture_eng, self.city_eng)
-        return "〒{}-{}, {} {} {}({} {} {})".format(self.postal_code[:3], self.postal_code[3:],
-                                                   self.prefecture_kanji, self.city_kanji,
-                                                   self.town_area_kanji, self.prefecture_eng,
-                                                   self.city_eng, self.town_area_eng)
-
-
 class Jusho:
-    def __init__(self):
-        self.conn = sqlite3.connect(get_database_path())
-        self.c = self.conn.cursor()
+    def __init__(self, database_path=None):
+        path = database_path or get_database_path()
+        if not os.path.exists(path):
+            raise FileNotFoundError("database file not found. \n"
+                                    "Consider to create a database file with jusho.create_database()")
+        self.conn = sqlite3.connect(database_path or get_database_path())
+        self.cursor = self.conn.cursor()
+        self.c = self.cursor
 
-    def from_postal_code(self, postal_code: str) -> Union[Address, None]:
-        postal_code = str(postal_code).replace('〒', '').replace('-', '').strip()
-        self.c.execute("SELECT * FROM address WHERE postal_code=?", (postal_code,))
-        result = self.c.fetchone()
-        return Address(*result) if result else None
+    def by_zip_code(self, zip_code: str) -> List[Address]:
+        zip_code = ''.join(re.findall(r'\d+', zip_code))
+        return gateway.addresses.fetch_address_by_zip_code(self.cursor, zip_code)
+
+    def fetch_by_id(self, id_: int) -> Union[Prefecture, City, Address]:
+        table = id_to_table_type(id_)
+        if table == 'prefectures':
+            return self.prefecture_by_id(id_)
+        elif table == 'cities':
+            return self.city_by_id(id_)
+        elif table == 'addresses':
+            return self.address_by_id(id_)
+        else:
+            raise ValueError(f"id_: {id_} does not seem to be a valid id")
+
+    # #-#-#-#-#-#-#-#-# PREFECTURES #-#-#-#-#-#-#-#-# #
+    def search_prefectures(self, query: str, type_='kanji') -> List[Prefecture]:
+        return gateway.prefectures.search_prefectures(self.cursor, query, type_)
 
     @property
-    def prefectures(self) -> List[Tuple[str]]:
-        self.c.execute("SELECT distinct prefecture_kana, prefecture_kanji, prefecture_eng FROM address")
-        return self.c.fetchall()
+    def prefectures(self) -> List[Prefecture]:
+        return gateway.prefectures.fetch_prefectures(self.cursor)
 
-    def cities_from_prefecture(self, prefecture: str, type_='kana') -> List[Tuple[str]]:
-        if type_ not in ('kana', 'kanji', 'eng'):
-            raise ValueError("type must be one of 'kana', 'kanji', 'eng'")
+    def prefecture_by_id(self, id_: int) -> Prefecture:
+        table = id_to_table_type(id_)
+        if table != 'prefectures':
+            warnings.warn(f"id_: {id_} does not seem to be a prefecture id. rather, it's a {table} id")
+        return gateway.prefectures.fetch_prefecture_by_id(self.cursor, id_)
 
-        self.c.execute(f"SELECT distinct city_kana, city_kanji, city_eng FROM address WHERE prefecture_{type_}=?",
-                       (prefecture,))
-        return self.c.fetchall()
+    # #-#-#-#-#-#-#-#-# CITIES #-#-#-#-#-#-#-#-# #
+    def cities(self, prefecture: Prefecture) -> List[City]:
+        return gateway.cities.fetch_cities_from_prefecture(self.cursor, prefecture)
 
-    def towns_from_city(self, prefecture: str, city: str, type_='kana') -> List[Address]:
-        if type_ not in ('kana', 'kanji', 'eng'):
-            raise ValueError("type must be one of 'kana', 'kanji', 'eng'")
+    def search_cities(self, query: str, prefecture: Prefecture = None, type_='kanji') -> List[City]:
+        """
+        search cities from query
+        if prefecture is specified, search cities from prefecture
+        """
+        if type_ not in ('kanji', 'kana', 'eng'):
+            raise ValueError("type must be one of 'kanji', 'kana', 'eng'")
 
-        self.c.execute(f"SELECT distinct * FROM address WHERE prefecture_{type_}=? AND city_{type_}=?",
-                       (prefecture, city))
-        return [Address(*result) for result in self.c.fetchall()]
+        return gateway.cities.search_cities(self.cursor, query, prefecture, type_)
 
-    def address_from_town(self, prefecture: str, city: str, town: str, type_='kana') -> Union[
-        List[Address], List[None]]:
-        if type_ not in ('kana', 'kanji', 'eng'):
-            raise ValueError("type must be one of 'kana', 'kanji', 'eng'")
+    def city_by_id(self, id_: int) -> City:
+        table = id_to_table_type(id_)
+        if table != 'cities':
+            warnings.warn(f"id_: {id_} does not seem to be a city id. rather, it's a {table} id")
+        return gateway.cities.fetch_city_by_id(self.cursor, id_)
 
-        self.c.execute(
-            f"SELECT distinct * FROM address WHERE prefecture_{type_}=? AND city_{type_}=? AND town_area_{type_}=?",
-            (prefecture, city, town))
-        result = self.c.fetchone()
-        return Address(*result) if result else [None]
+    # #-#-#-#-#-#-#-#-# ADDRESSES #-#-#-#-#-#-#-#-# #
+    def addresses(self, city: City) -> List[Address]:
+        return gateway.addresses.fetch_addresses_from_city(self.cursor, city)
+
+    def search_addresses(self, query: str,
+                         prefecture: Prefecture = None, city: City = None, type_='kanji') -> List[Address]:
+        """
+        search addresses from query
+        if prefecture is specified, search addresses from prefecture
+        if city is specified, search addresses from city
+        You can specify prefecture and city at the same time. But city must be a part of prefecture, and it's meaningless.
+        """
+        if type_ not in ('kanji', 'kana', 'eng'):
+            raise ValueError("type must be one of 'kanji', 'kana', 'eng'")
+        if prefecture and city:
+            if city.prefecture != prefecture:
+                raise ValueError("city must be a part of prefecture")
+
+        return gateway.addresses.search_addresses(self.cursor, query, prefecture, city, type_)
+
+    def address_by_id(self, id_: int) -> Address:
+        table = id_to_table_type(id_)
+        if table != 'addresses':
+            warnings.warn(f"id_: {id_} does not seem to be a address id. rather, it's a {table} id")
+        return gateway.addresses.fetch_address_by_id(self.cursor, id_)
 
     def close(self):
         self.conn.close()
