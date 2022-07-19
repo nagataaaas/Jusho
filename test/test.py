@@ -1,7 +1,7 @@
 import unittest
 from collections import Counter
 
-from jusho import Jusho
+from jusho import Jusho, Prefecture, City, Address
 
 
 class TestJusho(unittest.TestCase):
@@ -91,6 +91,33 @@ class TestJusho(unittest.TestCase):
         self.assertRaises(ValueError, self.postman.search_addresses, '歌舞伎町', city=city, prefecture=osaka)
         addresses = self.postman.search_addresses('歌舞伎町', prefecture=osaka)
         self.assertEqual(0, len(addresses))
+
+    def test_get_by_id(self):
+        self.assertIsInstance(self.postman.fetch_by_id(0), Prefecture)
+        self.assertIsInstance(self.postman.fetch_by_id(1), City)
+        self.assertIsInstance(self.postman.fetch_by_id(2), Address)
+        self.assertIsInstance(self.postman.fetch_by_id(3), Prefecture)
+
+    def test_prefecture_by_id(self):
+        prefecture = self.postman.prefecture_by_id(0)
+        self.assertIsInstance(prefecture, Prefecture)
+
+        with self.assertWarns(RuntimeWarning):
+            self.postman.prefecture_by_id(1)
+
+    def test_city_by_id(self):
+        city = self.postman.city_by_id(1)
+        self.assertIsInstance(city, City)
+
+        with self.assertWarns(RuntimeWarning):
+            self.postman.city_by_id(2)
+
+    def test_address_by_id(self):
+        address = self.postman.address_by_id(2)
+        self.assertIsInstance(address, Address)
+
+        with self.assertWarns(RuntimeWarning):
+            self.postman.address_by_id(3)
 
 
 if __name__ == "__main__":
