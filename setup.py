@@ -11,50 +11,65 @@ Useful example [HERE](https://github.com/nagataaaas/Jusho/tree/main/example/exam
 Using sqlite3 for the whole data. Runs really fast and uses less memory.
 
 ```python
-from jusho import Jusho
+from jusho import Jusho, Address, City, Prefecture
 
 postman = Jusho()
 
-print(postman.from_zip_code('160-0021')) # '1600021', '〒1600021' and whatever is valid
-  # 〒160-0021, 東京都 新宿区 歌舞伎町(TOKYO TO SHINJUKU KU KABUKICHO)
+print(postman.by_zip_code('160-0021'))  # '1600021', '〒1600021' and whatever is valid
+# [Address(id=116156, city=City(id=1972, prefecture=Prefecture(id=36, kanji='東京都', kana='トウキョウト', eng='TOKYO T...
 
 print(postman.prefectures)
-  # [('アイチケン', '愛知県', 'AICHI KEN'), ('アオモリケン', '青森県', 'AOMORI KEN'), ('アキタケン', '秋田県', 'AKITA KEN'), ('イシカワケン', '石川県', 'ISHIKAWA KEN'), ('イバラキケン', '茨城県'...
+# [Prefecture(id=0, kanji='北海道', kana='ホッカイドウ', eng='HOKKAIDO'), Prefecture(id=3, kanji='青森県', kana='アオモリケ...
 
-print(postman.cities_from_prefecture('大阪府', type='kanji'))
-  # [('ミシマグンシマモトチョウ', '三島郡島本町', 'MISHIMA GUN SHIMAMOTO CHO'), ('オオサカシミヤコジマク', '大阪市都島区', 'OSAKA SHI MIYAKOJIMA KU'), ('オオサカシフクシマク', '大阪市福島区', 'OSAK...
+osaka: Prefecture = postman.search_prefectures('大阪', 'kanji')[0]
+print(postman.cities(osaka))
+# [City(id=3613, prefecture=Prefecture(id=78, kanji='大阪府', kana='オオサカフ', eng='OSAKA FU'), kanji='大阪市都島区', ka...
 
-print(postman.towns_from_city('大阪府', '三島郡島本町', 'kanji'))
-  # [<Address: 〒618-0000, 大阪府 三島郡島本町 以下に掲載がない場合(OSAKA FU MISHIMA GUN SHIMAMOTO CHO IKANIKEISAIGANAIBAAI)>, <Address: 〒618-0015, 大阪府 三島郡島本町 青葉(OSAKA FU MISHIMA GUN SHIMAMOTO CHO AOBA)>, <Address: 〒618-0013, 大阪府 三島郡島本町 江川(OSAK...
+shimamoto: City = postman.search_cities('三島郡島本町', prefecture=osaka)[0]
+print(postman.addresses(shimamoto))
+# [Address(id=264932, city=City(id=3799, prefecture=Prefecture(id=78, kanji='大阪府', kana='オオサカフ', eng='OSAKA FU'), kanji='三島郡島本町', kana='ミシマグンシマモトチョウ', eng='MISHIMA ...
 
-aoba = postman.address_from_town('大阪府', '三島郡島本町', '青葉', 'kanji')
+aoba: Address = postman.search_addresses('青葉', city=shimamoto)[0]
+# `postman.search_addresses('青葉', prefecture=osaka)`, `postman.search_addresses('青葉')` are also valid
+# but the result is not the same.
 print(aoba.hyphen_zip)
-  # 618-0015
+# 618-0015
 
 \"""
 Address object has a lot of info
 \"""
 
-aoba.admin_division_code: str
-  # 全国地方公共団体コード(Administrative divisions Code)
-aoba.old_zip_code: str
-  # the old zip code
-aoba.zip_code: str
-  # the zip code
-aoba.prefecture_kana(_kanji, _eng): str
-  # prefecture name in hiragana, kanji, and English
-aoba.city_kana(_kanji, _eng): str
-  # city name in hiragana, kanji, and English
-aoba.town_area_kana(_kanji, _eng): str
-  # town area name in hiragana, kanji, and English
-aoba.multiple_zip_code: bool
-  # whether the area has alter zip codes
-aoba.multiple_address: bool
-  # whether the zip code includes multiple `Banchi`
-aoba.has_chome: bool
-  # whether the area has `Chome` which means subdivided areas
-aoba.multiple_town_area: bool
-  # whether the zip code includes multiple areas
+admin_division_code: str = aoba.admin_division_code  # 27301
+
+old_zip_code: str = aoba.old_zip_code  # 618
+
+zip_code: str = aoba.zip_code  # 6180015
+
+prefecture: Prefecture = aoba.prefecture  # Prefecture(id=78, kanji='大阪府', kana='オオサカフ', eng='OSAKA FU')
+
+city: City = aoba.city  # City(id=3799, prefecture=Prefecture(id=78, kanji='大阪府', kana='オオサカフ', eng='OSAKA FU'), kanji='三島郡島本町', kana='ミシマグンシマモトチョウ', eng='MISHIMA GUN SHIMAMOTO CHO')
+
+print('\n'.join((
+    aoba.kanji,  # 青葉
+    aoba.kana,  # アオバ
+    aoba.eng,  # AOBA
+    '--------',
+    aoba.concat_kanji,  # 大阪府　三島郡島本町　青葉
+    aoba.concat_kana,  # オオサカフ　ミシマグンシマモトチョウ　アオバ
+    aoba.concat_eng,  # Aoba, Mishima Gun Shimamoto Cho, Osaka Fu
+    '--------',
+    aoba.city.kanji,  # 三島郡島本町
+    aoba.city.kana,  # ミシマグンシマモトチョウ
+    aoba.city.eng,  # MISHIMA GUN SHIMAMOTO CHO
+    '--------',
+    aoba.city.concat_kanji,  # 大阪府　三島郡島本町
+    aoba.city.concat_kana,  # オオサカフ　ミシマグンシマモトチョウ
+    aoba.city.concat_eng,  # Mishima Gun Shimamoto Cho, Osaka Fu
+    '--------',
+    aoba.prefecture.kanji,  # 大阪府
+    aoba.prefecture.kana,  # オオサカフ
+    aoba.prefecture.eng,  # OSAKA FU
+)))
 
 ```
 """

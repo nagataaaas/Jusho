@@ -25,15 +25,15 @@ print(postman.by_zip_code('160-0021'))  # '1600021', '〒1600021' and whatever i
 print(postman.prefectures)
 # [Prefecture(id=0, kanji='北海道', kana='ホッカイドウ', eng='HOKKAIDO'), Prefecture(id=3, kanji='青森県', kana='アオモリケ...
 
-osaka = postman.search_prefectures('大阪', 'kanji')[0]
+osaka: Prefecture = postman.search_prefectures('大阪', 'kanji')[0]
 print(postman.cities(osaka))
 # [City(id=3613, prefecture=Prefecture(id=78, kanji='大阪府', kana='オオサカフ', eng='OSAKA FU'), kanji='大阪市都島区', ka...
 
-shimamoto = postman.search_cities('三島郡島本町', prefecture=osaka)[0]
+shimamoto: City = postman.search_cities('三島郡島本町', prefecture=osaka)[0]
 print(postman.addresses(shimamoto))
 # [Address(id=264932, city=City(id=3799, prefecture=Prefecture(id=78, kanji='大阪府', kana='オオサカフ', eng='OSAKA FU'), kanji='三島郡島本町', kana='ミシマグンシマモトチョウ', eng='MISHIMA ...
 
-aoba = postman.search_addresses('青葉', city=shimamoto)[0]
+aoba: Address = postman.search_addresses('青葉', city=shimamoto)[0]
 # `postman.search_addresses('青葉', prefecture=osaka)`, `postman.search_addresses('青葉')` are also valid
 # but the result is not the same.
 print(aoba.hyphen_zip)
