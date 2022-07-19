@@ -3,6 +3,7 @@ from typing import List, Optional
 
 from .utils import data_to_city
 from ..models import Prefecture, City
+from dataclasses import replace
 
 
 def fetch_cities_from_prefecture(cursor: Cursor, prefecture: Prefecture) -> List[City]:
@@ -10,8 +11,7 @@ def fetch_cities_from_prefecture(cursor: Cursor, prefecture: Prefecture) -> List
     data = cursor.fetchall()
     cities = []
     for v in data:
-        cities.append(City(*v))
-        cities[-1].prefecture = prefecture
+        cities.append(replace(City(*v), prefecture=prefecture))
 
     return cities
 
