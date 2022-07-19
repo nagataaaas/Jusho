@@ -1,3 +1,4 @@
+from dataclasses import replace
 from sqlite3 import Cursor
 from typing import List, Optional
 
@@ -21,8 +22,7 @@ def fetch_addresses_from_city(cursor: Cursor, city: City) -> List[Address]:
     data = cursor.fetchall()
     addresses = []
     for v in data:
-        addresses.append(Address(*v))
-        addresses[-1].city = city
+        addresses.append(replace(Address(*v), city=city))
 
     return addresses
 
