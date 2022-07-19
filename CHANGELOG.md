@@ -1,3 +1,8 @@
+# v0.1.0
+- Changed drastically
+  - Added `Prefecture`, `City` classes
+  - Changed Interface
+
 # v0.0.5
 - remove printf debug (so sorry)
 
