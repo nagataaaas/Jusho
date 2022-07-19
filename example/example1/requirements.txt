@@ -1,1 +1,3 @@
 responder
+typesystem==0.2.5
+jusho==0.1.0

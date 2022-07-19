@@ -5,129 +5,154 @@
     <title>example1</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
     <script>
-        function pref() {
-            $("#city").prop('disabled', true)
-            $("#town").prop('disabled', true)
-            $("#city").val('')
-            $("#town").val('')
-            if ($("#prefecture").val() === "") {
-                $("#pref-suggest").empty();
+        let prefecture;
+        let city;
+
+        function prefecture_onchange() {
+            cityInput.prop('disabled', true)
+            townInput.prop('disabled', true)
+            cityInput.val('')
+            townInput.val('')
+            if (prefectureInput.val() === "") {
+                prefSuggest.empty();
                 return;
             }
+            console.debug({"pref": prefectureInput.val()})
             $.ajax({
                 type: "POST",
                 url: "/api/pref",
                 dataType: 'json',
-                data: JSON.stringify({"pref": $("#prefecture").val()})
+                data: JSON.stringify({"pref": prefectureInput.val()})
             }).done((msg) => {
-                $("#pref-suggest").empty();
-                $("#pref-suggest").css('top', $("#prefecture").get(0).getBoundingClientRect()[3]);
+                prefSuggest.empty();
+                prefSuggest.css('top', prefectureInput.get(0).getBoundingClientRect()[3]);
                 msg.similar.forEach(e => {
-                    console.log(e)
-                    $("#pref-suggest").append(`<li onclick="prefer('${e[1]}')">${e[0]}</li>`)
+                    prefSuggest.append(`<li onclick="select_prefecture(${e.id}, '${e.name}')">${e.name}</li>`)
                 })
             })
         }
 
-        function prefer(str) {
-            $("#prefecture").val(str)
-            $("#pref-suggest").empty();
-            $("#city").prop('disabled', false)
+        function select_prefecture(id, name) {
+            prefectureInput.val(name)
+            prefecture = id;
+            prefSuggest.empty();
+            cityInput.prop('disabled', false)
         }
 
-        function cit() {
-            $("#town").prop('disabled', true)
-            $("#town").val('')
-            if ($("#city").val() === "") {
-                $("#city-suggest").empty();
+        function city_onchange() {
+            townInput.prop('disabled', true)
+            townInput.val('')
+            if (cityInput.val() === "") {
+                citySuggest.empty();
                 return;
             }
             $.ajax({
                 type: "POST",
                 url: "/api/city",
                 dataType: 'json',
-                data: JSON.stringify({"pref": $("#prefecture").val(), "city": $("#city").val()})
+                data: JSON.stringify({"pref": prefecture, "city": cityInput.val()})
             }).done((msg) => {
-                $("#city-suggest").empty();
-                $("#city-suggest").css('top', $("#city").get(0).getBoundingClientRect()[3]);
+                citySuggest.empty();
+                citySuggest.css('top', cityInput.get(0).getBoundingClientRect()[3]);
                 msg.similar.forEach(e => {
-                    console.log(e)
-                    $("#city-suggest").append(`<li onclick="citier('${e[1]}')">${e[0]}</li>`)
+                    citySuggest.append(`<li onclick="select_city(${e.id}, '${e.name}')">${e.name}</li>`)
                 })
             })
         }
 
-        function citier(str) {
-            $("#city").val(str)
-            $("#city-suggest").empty();
-            $("#town").prop('disabled', false)
+        function select_city(id, name) {
+            cityInput.val(name)
+            city = id;
+            citySuggest.empty();
+            townInput.prop('disabled', false)
         }
 
-        function tow() {
-            if ($("#town").val() === "") {
-                $("#town-suggest").empty();
+        function town_onchange() {
+            if (townInput.val() === "") {
+                townSuggest.empty();
                 return;
             }
             $.ajax({
                 type: "POST",
                 url: "/api/town",
                 dataType: 'json',
-                data: JSON.stringify({"pref": $("#prefecture").val(), "city": $("#city").val(), "town": $("#town").val()})
+                data: JSON.stringify({"city": city, "town": townInput.val()})
             }).done((msg) => {
-                $("#town-suggest").empty();
-                $("#town-suggest").css('top', $("#town").get(0).getBoundingClientRect()[3]);
+                townSuggest.empty();
+                townSuggest.css('top', townInput.get(0).getBoundingClientRect()[3]);
                 msg.similar.forEach(e => {
-                    console.log(e)
-                    $("#town-suggest").append(`<li onclick="towner('${e[1]}')">${e[0]}</li>`)
+                    townSuggest.append(`<li onclick="select_town(${e.id}, '${e.name}')">${e.name}</li>`)
                 })
             })
         }
 
-        function towner(str) {
-            $("#town").val(str)
-            $("#town-suggest").empty();
+        function select_town(id, name) {
+            townInput.val(name)
+            townSuggest.empty();
             $.ajax({
                 type: "POST",
-                url: "/api/postal",
+                url: "/api/zip",
                 dataType: 'json',
-                data: JSON.stringify({"pref": $("#prefecture").val(), "city": $("#city").val(), "town": $("#town").val()})
+                data: JSON.stringify({"town": id})
             }).done((msg) => {
-                $("#postalcode").text(`郵便番号: 〒${msg.postal}`);
+                $("#zipcode").text(`郵便番号: 〒${msg.zip}`);
             })
         }
     </script>
 </head>
 <body>
 <div class="container">
-    <h1 id="postalcode">郵便番号: </h1>
+    <h1 id="zipcode">郵便番号: </h1>
     <form>
         <div>
-            <input id="prefecture" autocomplete="off" onkeyup="pref()">
-            <label for="prefecture">都道府県</label>
-            <ul id="pref-suggest" class="suggest">
-            </ul>
+            <div class="input-wrapper">
+                <label for="prefecture">
+                    <input id="prefecture" autocomplete="off" onkeyup="prefecture_onchange()">
+                    都道府県
+                </label>
+                <ul id="pref-suggest" class="suggest">
+                </ul>
+            </div>
         </div>
         <div>
-            <input id="city" autocomplete="off" disabled onkeyup="cit()">
-            <label for="prefecture">市区町村</label>
-            <ul id="city-suggest" class="suggest">
-            </ul>
+            <div class="input-wrapper">
+                <label for="prefecture">
+                    <input id="city" autocomplete="off" disabled onkeyup="city_onchange()">
+                    市区町村
+                </label>
+                <ul id="city-suggest" class="suggest">
+                </ul>
+            </div>
         </div>
         <div>
-            <input id="town" autocomplete="off" disabled onkeyup="tow()">
-            <label for="prefecture">町域</label>
-            <ul id="town-suggest" class="suggest">
-            </ul>
+            <div class="input-wrapper">
+                <label for="prefecture">
+                    <input id="town" autocomplete="off" disabled onkeyup="town_onchange()">
+                    町域
+                </label>
+                <ul id="town-suggest" class="suggest">
+                </ul>
+            </div>
         </div>
     </form>
 </div>
+
+<script>
+    const prefectureInput = $("#prefecture");
+    const cityInput = $("#city");
+    const townInput = $("#town");
+
+    const prefSuggest = $("#pref-suggest");
+    const citySuggest = $("#city-suggest");
+    const townSuggest = $("#town-suggest");
+</script>
 <style>
     body {
         background: #EEEEEE;
         text-align: center;
     }
 
-    label{
+    label {
         width: 30%;
         display: inline-block;
     }
@@ -137,21 +162,22 @@
         background: white;
         padding-inline-start: 0;
         margin-block-start: 0;
+        max-height: 0;
+        z-index: 100;
     }
 
     li {
         width: 20em;
         font-size: 1.3em;
         border: 1px solid #DDD;
+        border-top: 0;
         padding-left: 2em;
         text-align: left;
         height: 1.5em;
         overflow: hidden;
+        background: white;
     }
 
-    .suggest {
-        position: absolute;
-    }
 
     .container {
         width: 90%;
@@ -160,19 +186,28 @@
         background: white;
     }
 
+    .input-wrapper {
+        display: flex;
+        flex-direction: column;
+    }
+
     input {
-        width: 60%;
+        width: 80%;
         height: 2em;
-        font-size: 1.2em;
+        font-size: 1.5rem;
     }
 
     label {
-        width: 30%;
+        width: 100%;
+        display: flex;
+        font-size: 1.5em;
+        justify-content: space-between;
+        align-items: center;
     }
 
     form > div {
         height: 30%;
-        margin: 10%;
+        padding: 5%;
     }
 
     form {
