@@ -12,7 +12,7 @@ import jusho.gateway as gateway
 from .models import Address, Prefecture, City, TABLE_COUNT
 
 ken_all_url = 'https://www.post.japanpost.jp/zipcode/dl/kogaki/zip/ken_all.zip'
-ken_all_rome_url = 'https://www.post.japanpost.jp/zipcode/dl/roman/ken_all_rome.zip'
+ken_all_rome_url = 'https://www.post.japanpost.jp/zipcode/dl/roman/KEN_ALL_ROME.zip'
 
 basicConfig(level='INFO')
 logger = getLogger(__name__)
