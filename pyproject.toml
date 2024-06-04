@@ -5,9 +5,6 @@ description = "Easy wrapper for the zip code data of Japan"
 authors = [
     { name = "nagataaaas", email = "nagata@nagata.pro" }
 ]
-dependencies = [
-    "jusho @ file:///C:/Users/nagata/Desktop/program/jusho",
-]
 readme = "README.md"
 requires-python = ">= 3.6"
 license = {text = "MIT License"}
