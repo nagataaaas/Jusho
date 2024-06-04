@@ -1,3 +1,9 @@
+# v1.0.1
+- fix broken link
+
+# v1.0.0
+- Added `Jusho` class
+
 # v0.1.0
 - Changed drastically
   - Added `Prefecture`, `City` classes

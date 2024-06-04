@@ -1,6 +1,6 @@
 [project]
 name = "jusho"
-version = "0.1.0"
+version = "1.0.1"
 description = "Easy wrapper for the zip code data of Japan"
 authors = [
     { name = "nagataaaas", email = "nagata@nagata.pro" }
