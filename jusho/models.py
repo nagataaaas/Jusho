@@ -4,7 +4,7 @@ TABLE_COUNT = 3
 
 
 def id_to_table_type(id_: int) -> str:
-    tables = ('prefectures', 'cities', 'addresses')
+    tables = ("prefectures", "cities", "addresses")
     return tables[id_ % TABLE_COUNT]
 
 
@@ -31,15 +31,15 @@ class City:
 
     @property
     def concat_kanji(self) -> str:
-        return f'{self.prefecture.kanji}　{self.kanji}'
+        return f"{self.prefecture.kanji}　{self.kanji}"
 
     @property
     def concat_kana(self) -> str:
-        return f'{self.prefecture.kana}　{self.kana}'
+        return f"{self.prefecture.kana}　{self.kana}"
 
     @property
     def concat_eng(self) -> str:
-        return f'{self.eng}, {self.prefecture.eng.title()}'.title()
+        return f"{self.eng}, {self.prefecture.eng.title()}".title()
 
 
 @dataclass(frozen=True)
@@ -63,15 +63,15 @@ class Address:
 
     @property
     def concat_kanji(self) -> str:
-        return f'{self.city.concat_kanji}　{self.kanji}'
+        return f"{self.city.concat_kanji}　{self.kanji}"
 
     @property
     def concat_kana(self) -> str:
-        return f'{self.city.concat_kana}　{self.kana}'
+        return f"{self.city.concat_kana}　{self.kana}"
 
     @property
     def concat_eng(self) -> str:
-        return f'{self.eng}, {self.city.concat_eng}'.title()
+        return f"{self.eng}, {self.city.concat_eng}".title()
 
     @property
     def prefecture(self) -> Prefecture:
@@ -82,10 +82,22 @@ class Address:
         return "{}-{}".format(self.zip_code[:3], self.zip_code[3:])
 
     def __str__(self):
-        if self.kanji == '以下に掲載がない場合':
-            return "〒{}-{}, {} {}({} {})".format(self.zip_code[:3], self.zip_code[3:],
-                                                 self.prefecture.kanji, self.city.kanji,
-                                                 self.prefecture.eng, self.city.eng)
-        return "〒{}-{}, {} {} {}({} {} {})".format(self.zip_code[:3], self.zip_code[3:],
-                                                   self.prefecture.kanji, self.city.kanji, self.kanji,
-                                                   self.prefecture.eng, self.city.eng, self.eng)
+        if self.kanji == "以下に掲載がない場合":
+            return "〒{}-{}, {} {}({} {})".format(
+                self.zip_code[:3],
+                self.zip_code[3:],
+                self.prefecture.kanji,
+                self.city.kanji,
+                self.prefecture.eng,
+                self.city.eng,
+            )
+        return "〒{}-{}, {} {} {}({} {} {})".format(
+            self.zip_code[:3],
+            self.zip_code[3:],
+            self.prefecture.kanji,
+            self.city.kanji,
+            self.kanji,
+            self.prefecture.eng,
+            self.city.eng,
+            self.eng,
+        )

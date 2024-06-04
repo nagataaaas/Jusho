@@ -7,7 +7,7 @@ from dataclasses import replace
 
 
 def fetch_cities_from_prefecture(cursor: Cursor, prefecture: Prefecture) -> List[City]:
-    cursor.execute(f"SELECT * FROM cities WHERE prefecture_id=?", (prefecture.id,))
+    cursor.execute("SELECT * FROM cities WHERE prefecture_id=?", (prefecture.id,))
     data = cursor.fetchall()
     cities = []
     for v in data:
@@ -17,19 +17,29 @@ def fetch_cities_from_prefecture(cursor: Cursor, prefecture: Prefecture) -> List
 
 
 def fetch_city_by_id(cursor: Cursor, id_: int) -> Optional[City]:
-    cursor.execute((f"SELECT p.*, c.* FROM cities AS c "
-                    f"JOIN prefectures AS p ON p.id = c.prefecture_id "
-                    f"WHERE c.id=?"), (id_,))
+    cursor.execute(
+        (
+            "SELECT p.*, c.* FROM cities AS c "
+            "JOIN prefectures AS p ON p.id = c.prefecture_id "
+            "WHERE c.id=?"
+        ),
+        (id_,),
+    )
     data = cursor.fetchone()
     return data_to_city(data) if data else None
 
 
-def search_cities(cursor: Cursor, query: str, prefecture: Prefecture, type_: str) -> List[City]:
-    query = [f"SELECT p.*, c.* FROM cities AS c "
-             f"JOIN prefectures AS p ON p.id = c.prefecture_id "
-             f"WHERE c.{type_} LIKE '%{query}%'", []]
+def search_cities(
+    cursor: Cursor, query: str, prefecture: Prefecture, type_: str
+) -> List[City]:
+    query = [
+        f"SELECT p.*, c.* FROM cities AS c "
+        f"JOIN prefectures AS p ON p.id = c.prefecture_id "
+        f"WHERE c.{type_} LIKE '%{query}%'",
+        [],
+    ]
     if prefecture:
-        query[0] += ' AND p.id = ?'
+        query[0] += " AND p.id = ?"
         query[1].append(prefecture.id)
 
     cursor.execute(*query)
