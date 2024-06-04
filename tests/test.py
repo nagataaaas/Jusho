@@ -6,7 +6,7 @@ from jusho import Jusho, Prefecture, City, Address
 
 class TestJusho(unittest.TestCase):
     """
-    test class of jusho
+    tests class of jusho
     """
     postman = Jusho()
 
