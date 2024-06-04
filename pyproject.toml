@@ -1,0 +1,61 @@
+[project]
+name = "jusho"
+version = "0.1.0"
+description = "Easy wrapper for the zip code data of Japan"
+authors = [
+    { name = "nagataaaas", email = "nagata@nagata.pro" }
+]
+dependencies = [
+    "jusho @ file:///C:/Users/nagata/Desktop/program/jusho",
+]
+readme = "README.md"
+requires-python = ">= 3.6"
+license = {text = "MIT License"}
+keywords = ["japan", "address"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Other Environment",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python",
+    "Topic :: Software Development :: Libraries :: Python Modules"
+]
+
+[project.urls]
+Homepage = "https://github.com/nagataaaas/Jusho"
+Documentation = "https://github.com/nagataaaas/Jusho"
+Repository = "https://github.com/nagataaaas/Jusho.git"
+Issues = "https://github.com/nagataaaas/Jusho/issues"
+Changelog = "https://github.com/nagataaaas/Jusho/blob/master/CHANGELOG.md"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.rye]
+managed = true
+dev-dependencies = [
+    "pytest>=8.2.1",
+]
+
+[tool.rye.scripts]
+install = { cmd = "rye add jusho --path ."}
+test = { cmd = "python tests/test.py" }
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["jusho"]
+
+[tool.setuptools.packages.find]
+exclude = ["build", "tests"]
+where = ["jusho"]
+
+[tool.setuptools.package-data]
+"jusho.data" = ["address.db"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests",]
