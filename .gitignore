@@ -1,8 +1,13 @@
 .idea
 .pypirc
+.venv
 MANIFEST.in
 static/*.CSV
 build/
 dist/
 jusho.egg-info/
 __pycache__
+
+.python-version
+requirements-dev.lock
+requirements.lock
